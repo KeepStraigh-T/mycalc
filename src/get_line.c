@@ -24,7 +24,7 @@ int get_line()
 		// add here upcoming operators
 		if((c >= '0' && c <= '9') ||
 		   (c == '+' || c == '-' || c == '*' || c == '/' || c == '%' ||
-		    c == '(' || c == ')'))
+		    c == '^' || c == '(' || c == ')'))
 		{
 			buffer.ptr[idx++] = c;
 			buffer.size++;

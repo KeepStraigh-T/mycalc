@@ -4,30 +4,29 @@ extern Buffer buffer;
 
 token parse_int()
 {
-  token temp = {0};
+	token temp = {0};
 
-  int num = 0;
-  int digits = 0;
-  bool isNegative = false; 
+	long long num   = 0;
+	int digits      = 0;
+	bool isNegative = false;
 
-  if(peek(0) == '-')
-  {
-    isNegative = true;
-    buffer.currentIdx++;
-  }
+	if(peek(0) == '-')
+	{
+		isNegative = true;
+		buffer.currentIdx++;
+	}
 
-  for(int i = 0; is_number(peek(i)); i++)
-    // if(peek(i) >= '0' && peek(i) <= '9')
-      digits++;
-  
-  for(int i = digits - 1; i >= 0; i--)
-    num += (buffer.ptr[buffer.currentIdx++] - '0') * pow(10, i);
+	for(int i = 0; is_number(peek(i)); i++)
+		digits++;
 
-  if(isNegative)
-    num *= -1;
+	for(int i = digits - 1; i >= 0; i--)
+		num += (buffer.ptr[buffer.currentIdx++] - '0') * my_power(10, i);
 
-  temp.numberValue = num;
-  temp.type = number; 
-  
-  return temp;
+	if(isNegative)
+		num *= -1;
+
+	temp.numberValue = num;
+	temp.type        = number;
+
+	return temp;
 }
