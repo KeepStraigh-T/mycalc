@@ -1,7 +1,5 @@
 #include "../Headers/calc.h"
 
-extern Buffer buffer;
-
 token pratt_parser(int min_preced)
 {
 	static int preced_raise = 0;

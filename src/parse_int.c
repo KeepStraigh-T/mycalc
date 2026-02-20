@@ -1,7 +1,5 @@
 #include "../Headers/calc.h"
 
-extern Buffer buffer;
-
 token parse_int()
 {
 	token temp = {0};

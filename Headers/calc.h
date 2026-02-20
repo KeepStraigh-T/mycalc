@@ -79,3 +79,5 @@ token pratt_parser(int min_preced);
 int get_line();
 int mainloop();
 long long my_power(int base, int exponent);
+
+extern Buffer buffer;

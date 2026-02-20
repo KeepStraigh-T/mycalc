@@ -1,7 +1,5 @@
 #include "../Headers/calc.h"
 
-extern Buffer buffer;
-
 int mainloop()
 {
 	while(true)
