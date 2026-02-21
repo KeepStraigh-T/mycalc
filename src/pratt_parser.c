@@ -4,6 +4,7 @@ token pratt_parser(int min_preced)
 {
 	static int preced_raise = 0;
 
+	// Increase precedence raise once '(' is encountered
 	while(peek(0) == '(')
 	{
 		buffer.currentIdx++;
@@ -14,6 +15,7 @@ token pratt_parser(int min_preced)
 
 	while(true)
 	{
+		// Decrease precedence raise once ')' is encountered
 		while(peek(0) == ')')
 		{
 			if(preced_raise > 0)

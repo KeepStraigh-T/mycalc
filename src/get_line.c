@@ -47,7 +47,8 @@ int get_line()
 		}
 	}
 
-	if(!strcmp(buffer.ptr, "quit"))
+	if(!strcmp(buffer.ptr, "quit") || !strcmp(buffer.ptr, "q") ||
+	   !strcmp(buffer.ptr, "exit"))
 		return QUIT;
 	else if(unassess_input)
 		return INVALID_INPUT;
