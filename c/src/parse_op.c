@@ -1,8 +1,7 @@
 #include "../Headers/calc.h"
 
-token parse_op()
+char parse_op(Buffer* buffer)
 {
-	token temp = {0};
 
 	if(is_operator(peek(0)))
 	{

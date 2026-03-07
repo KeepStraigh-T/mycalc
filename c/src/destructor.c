@@ -1,9 +1,7 @@
 #include "../Headers/calc.h"
 
-void destructor()
+void destructor(Buffer* buffer)
 {
-	free(buffer.ptr);
-	buffer.currentIdx = 0;
-	buffer.size       = 0;
-	buffer.capacity   = INITIAL_CAPACITY;
+	free(buffer->ptr);
+	free(buffer);
 }

@@ -1,15 +1,11 @@
 #include "../Headers/calc.h"
 
-token next_token()
+token* next_token(Buffer* buffer)
 {
-	token temp = {0};
+	token* temp = {0};
 
-	if(buffer.currentIdx == 0 && peek(0) == '-') // if '-' is a first token
-		temp = parse_int();
-	else if(peek(-1) == '(' && peek(0) == '-') // '-' token after '('
-		temp = parse_int();
-	else if(is_number(peek(0)))
-		temp = parse_int();
+	if(is_digit(peek(0)))
+		temp = parse_num(buffer);
 	else if(is_operator(peek(0)))
 		temp = parse_op();
 	else if(peek(0) == '\0')

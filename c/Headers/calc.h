@@ -1,3 +1,6 @@
+#ifndef _CALC_
+#define _CALC_
+
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -7,7 +10,7 @@
 
 #define PRECED_RAISE 5
 
-// #define DEBUG
+#define DEBUG
 
 #define ERR(str) fprintf(stderr, "Error: %s\n", str);
 #define SYNTAX_ERR -25
@@ -32,11 +35,13 @@ typedef enum
 	err = -1,
 	ok  = 0,
 	eof = 1
-} TokenState; // flags
+} TokenState;
 
 typedef enum
 {
-	number = 666, operator= 777 } TokenType;
+	numberType   = 666,
+	operatorType = 777
+} TokenType;
 
 enum
 {
@@ -46,10 +51,9 @@ enum
 	devision       = 2
 };
 
-typedef struct StringBuffer
+typedef struct
 {
 		char* ptr;
-		// const int8_t* it;
 		int currentIdx;
 		int capacity;
 		int size;
@@ -60,24 +64,32 @@ typedef struct
 		TokenType type;
 		union
 		{
-				long long numberValue;
+				long double numberValue;
 				char charValue;
 		};
 		TokenState state;
 		int preced;
-} token;
+} Token;
+
+typedef struct
+{
+		Token* items;
+		size_t capacity;
+		size_t size;
+} TokenArray;
 
 char peek(int offset);
-bool is_number(char input);
+bool is_digit(char input);
 bool is_operator(char input);
-void destructor();
-token parse_int();
-token parse_op();
-token next_token();
-token evaluate(token lhs, token rhs, int op_value);
-token pratt_parser(int min_preced);
-int get_line();
+void destructor(Buffer* buffer);
+long double parse_num(Buffer* buffer);
+char parse_op(Buffer* buffer);
+Token next_Token(Buffer* buffer);
+Token evaluate(Token lhs, Token rhs, int op_value);
+Token pratt_parser(int min_preced);
+int get_input(Buffer* buffer);
 int mainloop();
 long long my_power(int base, int exponent);
-
-extern Buffer buffer;
+TokenArray* lexer(Buffer* buffer);
+TokenArray* tokenizer(Buffer* buffer);
+#endif

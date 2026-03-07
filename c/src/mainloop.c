@@ -4,42 +4,69 @@ int mainloop()
 {
 	while(true)
 	{
-		buffer.ptr = malloc(sizeof(char) * INITIAL_CAPACITY);
-		if(buffer.ptr == NULL)
+		Buffer* buffer = calloc(1, sizeof(Buffer));
+		if(!buffer)
 		{
-			ERR("Memory allocation failed");
-			continue;
+			ERR("Buffer allocation failed");
+			return ALLOC_FAILED;
 		}
-		buffer.capacity = INITIAL_CAPACITY;
 
-		int getLine = get_line();
+		buffer->ptr = malloc(sizeof(char) * INITIAL_CAPACITY);
+		if(!(buffer->ptr))
+		{
+			free(buffer);
+			ERR("Buffer pointer allocation failed");
+			return ALLOC_FAILED;
+		}
+		buffer->capacity = INITIAL_CAPACITY;
+
+		int input = get_input(buffer);
 
 #ifdef DEBUG
-		printf("%s\n", buffer.ptr); // print buffer
+		printf("%s\n", buffer->ptr); // print buffer
 #endif
 
-		if(getLine == QUIT)
+		if(input == QUIT)
 		{
-			destructor();
+			// destructor(buffer);
+			free(buffer->ptr);
+			free(buffer);
 			printf("Quiting...\n");
 			return 0;
 		}
-		else if(getLine == INVALID_INPUT)
+		else if(input == INVALID_INPUT)
 		{
-			printf("Syntax error\n");
-			destructor();
+			printf("Error: unexpected character\n");
+			// destructor(buffer);
+			free(buffer->ptr);
+			free(buffer);
 			continue;
 		}
 		else
 		{
-			token result = pratt_parser(0);
+			TokenArray* tokens = tokenizer(buffer);
+			if(!tokens)
+			{
+				ERR("Allocation failed");
+				free(buffer->ptr);
+				free(buffer);
+				return ALLOC_FAILED;
+			}
+
+			// logic part
+
+			// token result = pratt_parser(0);
 			// if(result.flag == err)
 			//   printf("Syntax error\n");
 			// else
-			printf("result: %lld\n", result.numberValue);
+			// printf("result: %lld\n", result.numberValue);
 
-			puts("---------------------");
-			destructor();
+			// puts("---------------------");
+			// destructor(buffer);
+			free(tokens->items);
+			free(tokens);
+			free(buffer->ptr);
+			free(buffer);
 		}
 	}
 }
