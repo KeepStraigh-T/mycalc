@@ -1,11 +1,11 @@
 #include "../Headers/calc.h"
 
-long long my_power(int base, int exponent)
+long double my_power(long double base, int exponent)
 {
-	if(exponent == 0)
-		return 1;
+	if(exponent == 0.0)
+		return 1.0;
 
-	long long num = base;
+	long double num = base;
 
 	for(int exp = 1; exp < exponent; exp++)
 		num *= base;

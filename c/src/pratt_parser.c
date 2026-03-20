@@ -1,51 +1,64 @@
 #include "../Headers/calc.h"
 
-token pratt_parser(int min_preced)
+Token pratt_parser(TokenArray* tokenArr, int min_bp)
 {
-	static int preced_raise = 0;
+	Token lhs = next_token(tokenArr); // default is digit
 
-	// Increase precedence raise once '(' is encountered
-	while(peek(0) == '(')
+	if(lhs.charValue == '(') // open parentheses
 	{
-		buffer.currentIdx++;
-		preced_raise += PRECED_RAISE;
+		lhs = pratt_parser(tokenArr, 0);
+		assert(next_token(tokenArr).charValue == ')');
 	}
-
-	token lhs = next_token();
+	else if(lhs.type == operatorType) // prefix operator
+	{
+		Token prefix_op = prefix_binding_power(lhs);
+		Token rhs       = pratt_parser(tokenArr, prefix_op.r_bp);
+		lhs             = evaluate_tokens(prefix_op, lhs,
+		                                  rhs); // group two tokens (prefix op and digit)
+	}
 
 	while(true)
 	{
-		// Decrease precedence raise once ')' is encountered
-		while(peek(0) == ')')
-		{
-			if(preced_raise > 0)
-				preced_raise -= PRECED_RAISE;
-			buffer.currentIdx++;
-		}
+		Token op = peek_last(tokenArr);
 
-		token op = next_token();
-
-		op.preced += preced_raise;
-
-		if(op.state == err)
-		{
-			lhs.state = err;
-			return lhs;
-		}
-		else if(op.preced <= min_preced)
-		{
-			buffer.currentIdx--;
+		if(op.type == eof)
 			break;
-		}
 
-		token rhs = pratt_parser(op.preced);
-		if(rhs.state == err)
+		// if(op.type != operatorType || op.type != parentheses)
+		//     return (Token) {  }
+		assert(op.type == operatorType ||
+		       op.type == parentheses); // if digit - abort
+
+		// asigns infix binding powers
+		infix_binding_power(&op);
+
+		if(op.l_bp > 0 && op.r_bp > 0) // infix operator
 		{
-			lhs.state = err;
-			return lhs;
-		}
-		lhs = evaluate(lhs, rhs, op.charValue);
-	}
+			if(op.l_bp < min_bp)
+				break;
 
+			next_token(tokenArr);
+			Token rhs = pratt_parser(tokenArr, op.r_bp);
+
+			lhs = evaluate_tokens(op, lhs, rhs);
+			continue;
+		}
+
+		// asigns postfix binding powers
+		// postfix_binding_power(&op);
+		//
+		// if(op.l_bp > 0 && op.r_bp == 0)
+		// {
+		// 	if(op.l_bp < min_bp)
+		// 		break;
+		//
+		// 	next_token(tokenArr);
+		//
+		// 	Token rhs = {0};
+		// 	lhs       = evaluate_tokens(op, lhs, rhs);
+		// 	continue;
+		// }
+		break;
+	}
 	return lhs;
 }

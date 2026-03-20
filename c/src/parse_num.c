@@ -35,7 +35,8 @@ long double parse_num(Buffer* buffer)
 
 	if(buffer->ptr[buffer->currentIdx] != '.')
 		return num;
-	else if(!is_digit(buffer->ptr[++buffer->currentIdx]))
+	else if(!is_digit(buffer->ptr[++buffer->currentIdx])) // next token after
+	                                                      // '.' is not a number
 	{
 
 		ERR("Error parsing input, incorrect expression");

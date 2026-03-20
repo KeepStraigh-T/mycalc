@@ -1,17 +1,15 @@
 #include "../Headers/calc.h"
 
-token* next_token(Buffer* buffer)
+Token next_token(TokenArray* tokenArr)
 {
-	token* temp = {0};
+	Token temp = {0};
+	if(!tokenArr || !tokenArr->items)
+		return temp;
 
-	if(is_digit(peek(0)))
-		temp = parse_num(buffer);
-	else if(is_operator(peek(0)))
-		temp = parse_op();
-	else if(peek(0) == '\0')
-		temp.state = eof;
-	else
-		temp.state = err;
+	temp = *tokenArr->items[tokenArr->size - 1];
+
+	if(tokenArr->size > 1)
+		pop_back(tokenArr);
 
 	return temp;
 }

@@ -1,15 +1,17 @@
 #include "../Headers/calc.h"
+#include <math.h>
 
 TokenArray* tokenizer(Buffer* buffer)
 {
 	if(!buffer || !buffer->ptr)
 	{
-		ERR("_In_ buffer or buff->ptr is NULL")
+		ERR("buffer or buff->ptr is NULL")
 		return NULL;
 	}
 
-	TokenArray* tokens = calloc(1, sizeof(TokenArray));
-	if(!tokens)
+	TokenArray* tokenArr =
+	    calloc(1, sizeof(TokenArray)); // allocate tokens container
+	if(!tokenArr)
 	{
 		ERR("Memory allocation failed");
 		return NULL;
@@ -17,84 +19,85 @@ TokenArray* tokenizer(Buffer* buffer)
 
 	int tokenArrayCap = 64;
 
-	tokens->items = calloc(tokenArrayCap, sizeof(Token));
-	if(!tokens->items)
+	tokenArr->items =
+	    calloc(tokenArrayCap, sizeof(Token*)); // allocater pointer to tokens
+	if(!tokenArr->items)
 	{
 		ERR("Memory allocation failed");
-		free(tokens);
+		free(tokenArr);
 		return NULL;
 	}
 
-	tokens->capacity = tokenArrayCap;
+	tokenArr->capacity = tokenArrayCap;
 
-	for(int idx = 0; buffer->ptr[buffer->currentIdx] != '\0'; idx++)
+	int idx = 0;
+	while(true)
 	{
-		if(tokens->size == tokens->capacity)
+		if(tokenArr->size ==
+		   tokenArr->capacity) // reallocate pointer if capacity full
 		{
-			tokens->items =
-			    realloc(tokens->items, 2 * tokens->capacity * sizeof(Token));
-			if(!tokens->items)
+			Token** temp = realloc(tokenArr->items,
+			                       2 * tokenArr->capacity * sizeof(Token*));
+			if(!temp)
 			{
 				ERR("Memory allocation failed");
-				free(tokens);
+				destructArray(tokenArr);
 				return NULL;
 			}
+
+			tokenArr->items     = temp;
+			tokenArr->capacity *= 2;
 		}
 
-		Token* temp = calloc(1, sizeof(Token));
-		if(!temp)
+		tokenArr->items[idx] =
+		    calloc(1, sizeof(Token)); // allocate pointer to new token
+
+		if(!tokenArr->items[idx])
 		{
 			ERR("Memory allocation failed");
-			free(tokens->items);
-			free(tokens);
-		}
-
-		if(is_operator(buffer->ptr[buffer->currentIdx]))
-		{
-			tokens->items[idx].type      = operatorType;
-			tokens->items[idx].charValue = buffer->ptr[buffer->currentIdx++];
-			tokens->items[idx].state     = ok;
-			tokens->items[idx].preced    = 4;
-		}
-
-		else if(is_digit(buffer->ptr[buffer->currentIdx]))
-		{
-			long double val = parse_num(buffer);
-			if(isnan(val))
-			{
-				ERR("Error parsing number")
-				free(tokens->items);
-				free(tokens);
-				return NULL;
-			}
-
-			tokens->items[idx].type        = numberType;
-			tokens->items[idx].numberValue = val;
-			tokens->items[idx].state       = ok;
-			tokens->items[idx].preced      = -1;
-		}
-
-		else
-		{
-			ERR("Error parsing input, incorrect expression");
-			free(tokens->items);
-			free(tokens);
+			destructArray(tokenArr);
 			return NULL;
 		}
 
-#ifdef DEBUG
-		if(tokens->items[idx].type == numberType)
-			printf("%Lf", tokens->items[idx].numberValue);
-		else
-			printf("%c", tokens->items[idx].charValue);
-#endif
+		// Parse operator
+		if(is_operator(buffer->ptr[buffer->currentIdx]))
+			*tokenArr->items[idx] = parse_op(buffer->ptr[buffer->currentIdx++]);
+
+		// Parse number
+		else if(is_digit(buffer->ptr[buffer->currentIdx]))
+		{
+
+			long double val =
+			    parse_num(buffer); // Here increments buffer->currentIdx
+			if(isnan(val))
+			{
+				ERR("Error parsing number")
+				destructArray(tokenArr);
+				return NULL;
+			}
+
+			tokenArr->items[idx]->type        = numberType;
+			tokenArr->items[idx]->numberValue = val;
+			tokenArr->items[idx]->l_bp        = -1;
+			tokenArr->items[idx]->r_bp        = -1;
+		}
+		// EOF
+		else if(buffer->ptr[buffer->currentIdx] == '\n')
+		{
+			tokenArr->items[idx]->type = eof;
+			tokenArr->size++;
+			break;
+		}
+		else // Parsing failed
+		{
+			ERR("Error parsing input, incorrect expression");
+			destructArray(tokenArr);
+			return NULL;
+		}
+
+		tokenArr->size++;
+		idx++;
 	}
 
-#ifdef DEBUG
-	puts("");
-#endif
-
-	tokens->size++;
-
-	return tokens;
+	return tokenArr;
 }

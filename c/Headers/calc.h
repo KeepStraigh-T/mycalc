@@ -1,14 +1,14 @@
 #ifndef _CALC_
 #define _CALC_
 
+// #define NDEBUG // for disabling assert calls
+#include <assert.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define PRECED_RAISE 5
 
 #define DEBUG
 
@@ -32,15 +32,10 @@ enum
 
 typedef enum
 {
-	err = -1,
-	ok  = 0,
-	eof = 1
-} TokenState;
-
-typedef enum
-{
 	numberType   = 666,
-	operatorType = 777
+	operatorType = 777,
+	parentheses  = 999,
+	eof          = 888
 } TokenType;
 
 enum
@@ -67,13 +62,13 @@ typedef struct
 				long double numberValue;
 				char charValue;
 		};
-		TokenState state;
-		int preced;
+		int l_bp;
+		int r_bp;
 } Token;
 
 typedef struct
 {
-		Token* items;
+		Token** items;
 		size_t capacity;
 		size_t size;
 } TokenArray;
@@ -83,13 +78,23 @@ bool is_digit(char input);
 bool is_operator(char input);
 void destructor(Buffer* buffer);
 long double parse_num(Buffer* buffer);
-char parse_op(Buffer* buffer);
-Token next_Token(Buffer* buffer);
+Token parse_op(char c);
+Token next_token(TokenArray* tokenArr);
 Token evaluate(Token lhs, Token rhs, int op_value);
-Token pratt_parser(int min_preced);
+Token pratt_parser(TokenArray* tokens, int min_bp);
 int get_input(Buffer* buffer);
 int mainloop();
-long long my_power(int base, int exponent);
+long double my_power(long double base, int exponent);
 TokenArray* lexer(Buffer* buffer);
 TokenArray* tokenizer(Buffer* buffer);
+void destructArray(TokenArray* tokens);
+void pop_back(TokenArray* tokens);
+Token peek_last(const TokenArray* tokens);
+void reverseArray(TokenArray* tokens);
+void printArray(const TokenArray*);
+Token evaluate_tokens(Token op, Token lhs, Token rhs);
+void postfix_binding_power(Token* op);
+Token prefix_binding_power(Token op);
+void infix_binding_power(Token* op);
+
 #endif

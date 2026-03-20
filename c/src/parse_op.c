@@ -1,50 +1,41 @@
 #include "../Headers/calc.h"
 
-char parse_op(Buffer* buffer)
+Token parse_op(char c)
 {
+	Token temp = {0};
 
-	if(is_operator(peek(0)))
+	temp.type = operatorType;
+
+	switch(c)
 	{
-		switch(peek(0))
-		{
-			case '+':
-				temp.charValue = '+';
-				temp.preced    = 1;
-				break;
-			case '-':
-				temp.charValue = '-';
-				temp.preced    = 1;
-				break;
-			case '*':
-				temp.charValue = '*';
-				temp.preced    = 2;
-				break;
-			case '/':
-				temp.charValue = '/';
-				temp.preced    = 2;
-				break;
-			case '%':
-				temp.charValue = '%';
-				temp.preced    = 2;
-				break;
-			case '^':
-				temp.charValue = '^';
-				temp.preced    = 3;
-				break;
-			case '(':
-				temp.charValue = '(';
-				temp.preced    = 0;
-				break;
-			case ')':
-				temp.charValue = ')';
-				temp.preced    = 0;
-				break;
-			default:
-				break;
-		}
-		buffer.currentIdx++;
-		temp.type = operator;
-		return temp;
+		case '+':
+			temp.charValue = '+';
+			break;
+		case '-':
+			temp.charValue = '-';
+			break;
+		case '*':
+			temp.charValue = '*';
+			break;
+		case '/':
+			temp.charValue = '/';
+			break;
+		case '%':
+			temp.charValue = '%';
+			break;
+		case '^':
+			temp.charValue = '^';
+			break;
+		case '(':
+			temp.charValue = '(';
+			temp.type      = parentheses;
+			break;
+		case ')':
+			temp.charValue = ')';
+			temp.type      = parentheses;
+			break;
+		default:
+			break;
 	}
 
 	return temp;

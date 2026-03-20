@@ -2,8 +2,6 @@
 
 int get_input(Buffer* const buffer)
 {
-	printf("> ");
-
 	int idx             = 0;
 	bool unassess_input = false;
 	char c;
@@ -18,7 +16,7 @@ int get_input(Buffer* const buffer)
 			buffer->ptr = realloc(buffer->ptr, sizeof(char) * buffer->capacity);
 			if(buffer->ptr == NULL)
 			{
-				destructor(buffer);
+				free(buffer);
 				exit(ALLOC_FAILED);
 			}
 		}
@@ -38,11 +36,12 @@ int get_input(Buffer* const buffer)
 				continue;
 			else if(c == '\n')
 			{
-				buffer->ptr[idx] = '\0';
+				buffer->ptr[idx] = c;
+				buffer->size++;
 				break;
 			}
-			else
-			{ // could be implemented better (not to continue reading input)
+			else // exit or unassess input
+			{    // could be implemented better (not to continue reading input)
 				buffer->ptr[idx++] = c;
 				buffer->size++;
 				unassess_input = true;
@@ -51,8 +50,8 @@ int get_input(Buffer* const buffer)
 		}
 	}
 
-	if(!strcmp(buffer->ptr, "quit") || !strcmp(buffer->ptr, "q") ||
-	   !strcmp(buffer->ptr, "exit"))
+	if(!strcmp(buffer->ptr, "quit\n") || !strcmp(buffer->ptr, "q\n") ||
+	   !strcmp(buffer->ptr, "exit\n"))
 		return QUIT;
 	else if(unassess_input)
 		return INVALID_INPUT;
