@@ -4,6 +4,11 @@ long double my_power(long double base, int exponent)
 {
 	if(exponent == 0.0)
 		return 1.0;
+	else if(exponent < 0)
+	{
+		exponent *= -1;
+		base      = 1 / base;
+	}
 
 	long double num = base;
 

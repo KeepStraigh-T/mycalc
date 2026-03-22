@@ -9,8 +9,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define DEBUG
+#include <readline/history.h>
+#include <readline/readline.h>
+// #define DEBUG
 
 #define ERR(str) fprintf(stderr, "Error: %s\n", str);
 #define SYNTAX_ERR -25
@@ -21,56 +22,56 @@
 
 enum
 {
-	add       = '+',
-	substruct = '-',
-	multiply  = '*',
-	divide    = '/',
-	modulo    = '%',
-	pleft     = '(',
-	pright    = ')'
+  add = '+',
+  substruct = '-',
+  multiply = '*',
+  divide = '/',
+  modulo = '%',
+  pleft = '(',
+  pright = ')'
 }; // operator value
 
 typedef enum
 {
-	numberType   = 666,
-	operatorType = 777,
-	parentheses  = 999,
-	eof          = 888
+  numberType = 666,
+  operatorType = 777,
+  parentheses = 999,
+  eof = 888
 } TokenType;
 
 enum
 {
-	addition       = 1,
-	substruction   = 1,
-	multiplication = 2,
-	devision       = 2
+  addition = 1,
+  substruction = 1,
+  multiplication = 2,
+  devision = 2
 };
 
 typedef struct
 {
-		char* ptr;
-		int currentIdx;
-		int capacity;
-		int size;
+  char* ptr;
+  int currentIdx;
+  int capacity;
+  int size;
 } Buffer;
 
 typedef struct
 {
-		TokenType type;
-		union
-		{
-				long double numberValue;
-				char charValue;
-		};
-		int l_bp;
-		int r_bp;
+  TokenType type;
+  union
+  {
+    long double numberValue;
+    char charValue;
+  };
+  int l_bp;
+  int r_bp;
 } Token;
 
 typedef struct
 {
-		Token** items;
-		size_t capacity;
-		size_t size;
+  Token* items;
+  size_t capacity;
+  size_t size;
 } TokenArray;
 
 char peek(int offset);
